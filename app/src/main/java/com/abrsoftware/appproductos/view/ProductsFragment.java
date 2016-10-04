@@ -3,57 +3,79 @@ package com.abrsoftware.appproductos.view;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.abrsoftware.appproductos.R;
+import com.abrsoftware.appproductos.adapter.ProductsAdapter;
+import com.abrsoftware.appproductos.adapter.ProductsAdapter.ProductItemListener;
+import com.abrsoftware.appproductos.products.domain.model.Product;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProductsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+
+
 public class ProductsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    private RecyclerView mProductsList;
+    private ProductsAdapter mProductsAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private View mEmptyView;
+    private ProductItemListener mItemListener = new ProductItemListener() {
+        @Override
+        public void onProductClick(Product clickedNote) {
+            // Aquí lanzarías la pantalla de detalle del producto
+        }
+    };
 
     public ProductsFragment() {
-        // Required empty public constructor
     }
 
-
-    // TODO: Rename and change types and number of parameters
-    public static ProductsFragment newInstance(String param1, String param2) {
-        ProductsFragment fragment = new ProductsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static ProductsFragment newInstance() {
+        return new ProductsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        mProductsAdapter = new ProductsAdapter(new ArrayList<Product>(0), mItemListener);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_products, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_products, container, false);
+        //Referencias UI
+        mProductsList = (RecyclerView) rootView.findViewById(R.id.products_list);
+        mEmptyView = rootView.findViewById(R.id.noProducts);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
+
+        return rootView;
     }
+
+    private void setUpProductsList() {
+        mProductsList.setAdapter(mProductsAdapter);
+        mProductsList.setHasFixedSize(true);
+    }
+
+    private void setUptRefreshLayout() {
+        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(),
+                R.color.colorPrimary), ContextCompat.getColor(getActivity(),
+                R.color.colorAccent), ContextCompat.getColor(getActivity(),
+                R.color.colorPrimaryDark));
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+            }
+        });
+    }
+
+
 
 }

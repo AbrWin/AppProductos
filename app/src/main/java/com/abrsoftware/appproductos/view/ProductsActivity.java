@@ -1,4 +1,4 @@
-package com.abrsoftware.appproductos;
+package com.abrsoftware.appproductos.view;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.abrsoftware.appproductos.R;
 import com.abrsoftware.appproductos.view.ProductsFragment;
 
 public class ProductsActivity extends AppCompatActivity {
@@ -30,7 +31,7 @@ public class ProductsActivity extends AppCompatActivity {
 
     private void setUpProductsFragment() {
         if (mProductsFragment == null) {
-            mProductsFragment = ProductsFragment.newInstance(null, null);
+            mProductsFragment = ProductsFragment.newInstance();
             getSupportFragmentManager().beginTransaction().add(R.id.products_container, mProductsFragment).commit();
         }
     }

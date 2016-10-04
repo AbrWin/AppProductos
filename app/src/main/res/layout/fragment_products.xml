@@ -13,6 +13,7 @@
 
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/products_list"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

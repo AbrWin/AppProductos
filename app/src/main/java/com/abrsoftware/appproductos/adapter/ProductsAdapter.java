@@ -1,6 +1,7 @@
 package com.abrsoftware.appproductos.adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +11,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.abrsoftware.appproductos.R;
+import com.abrsoftware.appproductos.products.DataLoading;
 import com.abrsoftware.appproductos.products.domain.model.Product;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,7 +24,7 @@ import java.util.List;
  * Created by AbrWin on 27/09/16.
  */
 
-public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements DataLoading {
 
     private List<Product> mProducts;
     private ProductItemListener mItemListener;
@@ -28,8 +32,11 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final static int TYPE_PRODUCT = 1;
     private final static int TYPE_LOADING_MORE = 2;
 
-    public ProductsAdapter(List<Product> mProducts, ProductItemListener itemListener) {
-        setList(mProducts);
+    private boolean mLoading = false;
+    private boolean mMoreData = false;
+
+    public ProductsAdapter(List<Product> products, ProductItemListener itemListener) {
+        setList(products);
         mItemListener = itemListener;
     }
 
@@ -47,7 +54,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view;
 
-
         if (viewType == TYPE_LOADING_MORE) {
             view = layoutInflater.inflate(R.layout.item_loading_footer, parent, false);
             return new LoadingMoreHolder(view);
@@ -55,22 +61,103 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         view = layoutInflater.inflate(R.layout.item_product, parent, false);
         return new ProductsHolder(view, mItemListener);
-
-
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
+        switch (getItemViewType(position)) {
+            case TYPE_PRODUCT:
+                Product product = mProducts.get(position);
+                ProductsHolder productsHolder = (ProductsHolder)holder;
+                productsHolder.price.setText(product.getFormatedPrice());
+                productsHolder.name.setText(product.getmName());
+                productsHolder.unitsInStock.setText(product.getFormattedUnitsInStock());
+                Glide.with(holder.itemView.getContext())
+                        .load(product.getmImageUrl())
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .centerCrop()
+                        .into(productsHolder.featuredImage);
+                break;
+            case TYPE_LOADING_MORE:
+                bindLoadingViewHolder((LoadingMoreHolder) holder, position);
+                break;
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return 0;
+    private void bindLoadingViewHolder(LoadingMoreHolder viewholder, int position ){
+        viewholder.progress.setVisibility((position > 0 && mLoading && mMoreData)
+                ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    private void replaceData(List<Product> notes){
+        setList(notes);
     }
 
     private void setList(List<Product> notes) {
         mProducts = checkNotNull(notes);
+        notifyDataSetChanged();
+    }
+
+    private void addData(List<Product> products){
+        mProducts.addAll(products);
+    }
+
+    @Override
+    public int getItemCount() {
+        return getDataItemCount() + (mLoading ? 1 : 0);
+    }
+
+    private Product getItem(int position){
+        return mProducts.get(position);
+    }
+
+    private void dataStartedLoading(){
+        if(mLoading)
+            return;
+        mLoading = true;
+        Handler h = new Handler();
+        h.post(new Runnable() {
+            @Override
+            public void run() {
+                notifyItemInserted(getLoadingMoreItemPosition());
+            }
+        });
+    }
+
+    private void dataFinishedLoading(){
+        if(!mLoading)
+            return;
+        final int loadingPos = getLoadingMoreItemPosition();
+        mLoading = false;
+        Handler h = new Handler();
+        h.post(new Runnable() {
+            @Override
+            public void run() {
+                notifyItemRemoved(loadingPos);
+            }
+        });
+    }
+
+    public void setMoreData(boolean more) {
+        mMoreData = more;
+    }
+
+    private int getLoadingMoreItemPosition() {
+        return mLoading ? getItemCount() - 1 : RecyclerView.NO_POSITION;
+    }
+
+    private int getDataItemCount(){
+        return mProducts.size();
+    }
+
+    @Override
+    public boolean isLoadingData() {
+        return mLoading;
+    }
+
+    @Override
+    public boolean isThereMoreData() {
+        return mMoreData;
     }
 
 
@@ -100,10 +187,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mItemListener.onProductClick(product);
         }
 
-        public Product getItem(int position) {
-            return mProducts.get(position);
-        }
-
     }
 
     private class LoadingMoreHolder extends RecyclerView.ViewHolder {
@@ -119,7 +202,4 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void onProductClick(Product clickedNote);
     }
 
-    private int getDataItemCount(){
-        return mProducts.size();
-    }
 }
