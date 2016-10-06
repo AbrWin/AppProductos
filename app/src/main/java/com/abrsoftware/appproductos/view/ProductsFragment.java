@@ -16,9 +16,10 @@ import com.abrsoftware.appproductos.adapter.ProductsAdapter.ProductItemListener;
 import com.abrsoftware.appproductos.products.domain.model.Product;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class ProductsFragment extends Fragment {
+public class ProductsFragment extends Fragment implements ProductsMvp.View{
 
     private RecyclerView mProductsList;
     private ProductsAdapter mProductsAdapter;
@@ -77,5 +78,49 @@ public class ProductsFragment extends Fragment {
     }
 
 
+    @Override
+    public void showProducts(List<Product> products) {
+        mProductsAdapter.replaceData(products);
+        mEmptyView.setVisibility(View.GONE);
+        mProductsList.setVisibility(View.VISIBLE);
+    }
 
+    @Override
+    public void showLoadingState(final boolean show) {
+        if(getView() == null)
+            return;
+
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(show);
+            }
+        });
+
+    }
+
+    @Override
+    public void showEmptyState() {
+
+    }
+
+    @Override
+    public void showProductError(String msg) {
+
+    }
+
+    @Override
+    public void showProductsPage(List<Product> products) {
+
+    }
+
+    @Override
+    public void showLoadMoreIndicator(boolean show) {
+
+    }
+
+    @Override
+    public void allowMoreData(boolean show) {
+
+    }
 }

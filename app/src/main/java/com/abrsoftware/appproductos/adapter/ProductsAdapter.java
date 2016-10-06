@@ -89,8 +89,9 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private void replaceData(List<Product> notes){
+    public void replaceData(List<Product> notes){
         setList(notes);
+        notifyDataSetChanged();
     }
 
     private void setList(List<Product> notes) {
