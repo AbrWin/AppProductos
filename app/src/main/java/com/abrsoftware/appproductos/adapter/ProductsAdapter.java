@@ -99,7 +99,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyDataSetChanged();
     }
 
-    private void addData(List<Product> products){
+    public void addData(List<Product> products){
         mProducts.addAll(products);
     }
 

@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.abrsoftware.appproductos.R;
 import com.abrsoftware.appproductos.adapter.ProductsAdapter;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ProductsFragment extends Fragment implements ProductsMvp.View{
+public class ProductsFragment extends Fragment implements ProductsMvp.View {
 
     private RecyclerView mProductsList;
     private ProductsAdapter mProductsAdapter;
@@ -87,7 +88,7 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View{
 
     @Override
     public void showLoadingState(final boolean show) {
-        if(getView() == null)
+        if (getView() == null)
             return;
 
         swipeRefreshLayout.post(new Runnable() {
@@ -101,16 +102,18 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View{
 
     @Override
     public void showEmptyState() {
-
+        mProductsList.setVisibility(View.GONE);
+        mEmptyView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showProductError(String msg) {
-
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showProductsPage(List<Product> products) {
+        mProductsAdapter.addData(products);
 
     }
 
