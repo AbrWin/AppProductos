@@ -1,5 +1,6 @@
 package com.abrsoftware.appproductos.data.products;
 
+import com.abrsoftware.appproductos.products.domain.criteria.ProductCriteria;
 import com.abrsoftware.appproductos.products.domain.model.Product;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface IProductsRepository {
         void onDataNotAvailable(String error);
     }
 
-    void getProducts(GetProductsCallback callback);
+    void getProducts(GetProductsCallback callback, ProductCriteria criteria);
 
     void refreshProducts();
 

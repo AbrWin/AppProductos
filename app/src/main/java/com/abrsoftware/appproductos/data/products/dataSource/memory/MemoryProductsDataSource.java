@@ -29,18 +29,19 @@ public class MemoryProductsDataSource implements IMemoryProductsDataSource {
         if(mCachedProducts == null){
             mCachedProducts  = new LinkedHashMap<>();
         }
-
         mCachedProducts.put(product.getmCode(), product);
-
     }
 
     @Override
     public void deleteAll() {
-
+        if(mCachedProducts == null){
+            mCachedProducts  = new LinkedHashMap<>();
+        }
+        mCachedProducts.clear();
     }
 
     @Override
     public boolean mapIsNull() {
-        return false;
+        return mCachedProducts == null;
     }
 }
