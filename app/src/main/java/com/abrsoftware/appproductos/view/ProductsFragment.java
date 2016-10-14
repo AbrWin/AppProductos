@@ -33,6 +33,8 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
         }
     };
 
+    private ProductsPresenter mProductPresenter;
+
     public ProductsFragment() {
     }
 
@@ -44,6 +46,7 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mProductsAdapter = new ProductsAdapter(new ArrayList<Product>(0), mItemListener);
+        //mProductPresenter = new ProductsPresenter(Depen)
 
     }
 
