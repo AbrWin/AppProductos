@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.abrsoftware.appproductos.R;
 import com.abrsoftware.appproductos.adapter.ProductsAdapter;
 import com.abrsoftware.appproductos.adapter.ProductsAdapter.ProductItemListener;
+import com.abrsoftware.appproductos.di.DependencyProvider;
 import com.abrsoftware.appproductos.products.domain.model.Product;
 
 import java.util.ArrayList;
@@ -46,8 +47,8 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mProductsAdapter = new ProductsAdapter(new ArrayList<Product>(0), mItemListener);
-        //mProductPresenter = new ProductsPresenter(Depen)
-
+        mProductPresenter = new ProductsPresenter(DependencyProvider.provideProductsRepository(getActivity()), this);
+        setRetainInstance(true);
     }
 
     @Override

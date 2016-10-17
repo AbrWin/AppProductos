@@ -24,8 +24,23 @@ public class DependencyProvider {
     public static ProductsRepository provideProductsRepository(@NonNull Context contex){
         mContex = checkNotNull(contex);
         if(mProductsRepository == null){
-            //mProductsRepository = new ProductsRepository(getm)
+           mProductsRepository = new ProductsRepository(getMemorySource(),
+                   getCloudSource(), contex);
         }
-        return null;
+        return mProductsRepository;
+    }
+
+    public static MemoryProductsDataSource getMemorySource(){
+        if(memorySource == null){
+            memorySource = new MemoryProductsDataSource();
+        }
+        return memorySource;
+    }
+
+    public static CloudProductsDataSource getCloudSource(){
+        if(cloudSource == null){
+            cloudSource = new CloudProductsDataSource();
+        }
+        return cloudSource;
     }
 }

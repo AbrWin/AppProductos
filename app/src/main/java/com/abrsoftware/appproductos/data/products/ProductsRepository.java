@@ -33,6 +33,11 @@ public class ProductsRepository implements IProductsRepository {
     @Override
     public void getProducts(GetProductsCallback callback, ProductCriteria criteria) {
         if (!mMemoryProductsDataSource.mapIsNull() && !mReload) {
+            getProductsFromMemory(callback, criteria);
+            return;
+        }
+
+        if (mReload) {
             getProductsFromServer(callback, criteria);
         } else {
             List<Product> products = mMemoryProductsDataSource.find(criteria);
@@ -71,7 +76,7 @@ public class ProductsRepository implements IProductsRepository {
 
     private void refreshMemoryDataSource(List<Product> products) {
         mMemoryProductsDataSource.deleteAll();
-        for (Product product : products){
+        for (Product product : products) {
             mMemoryProductsDataSource.save(product);
         }
         mReload = false;
