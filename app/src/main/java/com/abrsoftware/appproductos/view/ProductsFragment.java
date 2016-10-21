@@ -2,9 +2,11 @@ package com.abrsoftware.appproductos.view;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,12 +62,37 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
         mEmptyView = rootView.findViewById(R.id.noProducts);
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_layout);
 
+        //Setup
+        setUpProductsList();
+        setUptRefreshLayout();
+        if(savedInstanceState != null){
+            hideList(false);
+        }
+
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if(savedInstanceState == null){
+            mProductPresenter.loadProducts(false);
+        }
     }
 
     private void setUpProductsList() {
         mProductsList.setAdapter(mProductsAdapter);
         mProductsList.setHasFixedSize(true);
+
+        final LinearLayoutManager layoutManager = (LinearLayoutManager)mProductsList.getLayoutManager();
+
+        //Se agrega escucha de scroll infinito
+        mProductsList.addOnScrollListener(new InfinityScrollListener(mProductsAdapter, layoutManager) {
+            @Override
+            public void onLoadMore() {
+                mProductPresenter.loadProducts(false);
+            }
+        });
     }
 
     private void setUptRefreshLayout() {
@@ -77,7 +104,7 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
+                mProductPresenter.loadProducts(true);
             }
         });
     }
@@ -86,8 +113,7 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
     @Override
     public void showProducts(List<Product> products) {
         mProductsAdapter.replaceData(products);
-        mEmptyView.setVisibility(View.GONE);
-        mProductsList.setVisibility(View.VISIBLE);
+        hideList(false);
     }
 
     @Override
@@ -106,8 +132,13 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
 
     @Override
     public void showEmptyState() {
-        mProductsList.setVisibility(View.GONE);
-        mEmptyView.setVisibility(View.VISIBLE);
+        hideList(true);
+    }
+
+    private void hideList(boolean hide){
+        mProductsList.setVisibility(hide ? View.GONE: View.VISIBLE);
+        mEmptyView.setVisibility(hide ? View.VISIBLE: View.GONE);
+        return;
     }
 
     @Override
@@ -118,16 +149,21 @@ public class ProductsFragment extends Fragment implements ProductsMvp.View {
     @Override
     public void showProductsPage(List<Product> products) {
         mProductsAdapter.addData(products);
+        hideList(false);
 
     }
 
     @Override
     public void showLoadMoreIndicator(boolean show) {
-
+        if(!show){
+            mProductsAdapter.dataFinishedLoading();
+        }else {
+            mProductsAdapter.dataStartedLoading();
+        }
     }
 
     @Override
     public void allowMoreData(boolean show) {
-
+        mProductsAdapter.setMoreData(show);
     }
 }

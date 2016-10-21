@@ -112,7 +112,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return mProducts.get(position);
     }
 
-    private void dataStartedLoading(){
+    public void dataStartedLoading(){
         if(mLoading)
             return;
         mLoading = true;
@@ -125,7 +125,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         });
     }
 
-    private void dataFinishedLoading(){
+    public void dataFinishedLoading(){
         if(!mLoading)
             return;
         final int loadingPos = getLoadingMoreItemPosition();

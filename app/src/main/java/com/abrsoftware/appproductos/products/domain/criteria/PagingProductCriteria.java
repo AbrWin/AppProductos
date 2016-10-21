@@ -14,8 +14,8 @@ public class PagingProductCriteria implements ProductCriteria {
     private final int mLimit;
 
     public PagingProductCriteria(int page, int limit) {
-        this.mPage = page;
-        this.mLimit = limit;
+        mPage = page;
+        mLimit = limit;
     }
 
     @Override
